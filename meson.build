@@ -1,0 +1,60 @@
+project('instrew-runner', ['c'],
+        default_options: [
+            'buildtype=debugoptimized',
+            'default_library=static',
+            'warning_level=3',
+            'c_std=c17'
+        ])
+
+add_project_arguments(['-Wmissing-field-initializers',
+                       '-Wunused-parameter',
+                       '-Wshadow',
+                       '-Wpointer-arith',
+                       '-Wwrite-strings',
+                       '-Winline',
+                       '-Wformat-nonliteral',
+                       '-Wformat-security',
+                       '-Wswitch-default',
+                       '-Wundef',
+                       '-Wno-cast-align', # we frequently do casts
+                       '-Werror=incompatible-pointer-types',
+                       '-Werror=implicit-function-declaration'],
+                      language: 'c')
+
+
+sources = [
+    'dispatch.c',
+    'elf-loader.c',
+    'emulate.c',
+    'main.c',
+    'math.c',
+    'memory.c',
+    'minilib.c',
+    'rtld.c',
+]
+
+c_args = ['-D_GNU_SOURCE', '-fno-builtin', '-fno-stack-protector', '-fomit-frame-pointer', '-fPIC']
+
+link_args = ['-nostartfiles', '-lgcc']
+
+compiler = meson.get_compiler('c')
+if compiler.has_argument('-static-pie')
+    link_args += ['-static-pie']
+else
+    link_args += ['-Wl,-static', '-Wl,-pie', '-Wl,--no-dynamic-linker', '-Wl,-z,text']
+endif
+
+if compiler.has_argument('-mpreferred-stack-boundary=3') # GCC
+    c_args += ['-mpreferred-stack-boundary=3']
+elif compiler.has_argument('-mstack-alignment=3') # Clang
+    cc_args += ['-mstack-alignment=3']
+else
+    error('could not lower stack aligment')
+endif
+
+runner = executable('instrew-runner',
+                    sources,
+                    include_directories: include_directories('.'),
+                    c_args: c_args,
+                    link_args: link_args,
+                    install: true)
