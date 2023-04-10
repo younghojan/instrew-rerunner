@@ -1,5 +1,5 @@
-#ifndef _INSTREW_RUNNER_COMMON_H
-#define _INSTREW_RUNNER_COMMON_H
+#ifndef _INSTREW_RERUNNER_COMMON_H
+#define _INSTREW_RERUNNER_COMMON_H
 
 #include <stdarg.h>
 #include <stdbool.h>

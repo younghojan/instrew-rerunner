@@ -1,6 +1,6 @@
 
-#ifndef _INSTREW_RUNNER_ELF_LOADER_H
-#define _INSTREW_RUNNER_ELF_LOADER_H
+#ifndef _INSTREW_RERUNNER_ELF_LOADER_H
+#define _INSTREW_RERUNNER_ELF_LOADER_H
 
 #include <elf.h>
 #include <stddef.h>

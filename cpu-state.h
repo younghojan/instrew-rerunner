@@ -1,5 +1,5 @@
-#ifndef _INSTREW_RUNNER_CPU_STATE_H
-#define _INSTREW_RUNNER_CPU_STATE_H
+#ifndef _INSTREW_RERUNNER_CPU_STATE_H
+#define _INSTREW_RERUNNER_CPU_STATE_H
 
 #include "common.h"
 #include "rtld.h"

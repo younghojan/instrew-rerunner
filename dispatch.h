@@ -1,5 +1,5 @@
-#ifndef _INSTREW_RUNNER_DISPATCH_H
-#define _INSTREW_RUNNER_DISPATCH_H
+#ifndef _INSTREW_RERUNNER_DISPATCH_H
+#define _INSTREW_RERUNNER_DISPATCH_H
 
 #include "common.h"
 #include "dispatcher-info.h"
