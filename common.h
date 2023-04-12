@@ -1,5 +1,5 @@
-#ifndef _INSTREW_RERUNNER_COMMON_H
-#define _INSTREW_RERUNNER_COMMON_H
+#ifndef _INSTREW_RUNNER_COMMON_H
+#define _INSTREW_RUNNER_COMMON_H
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -28,6 +28,7 @@ typedef __kernel_off_t off_t;
 typedef __kernel_pid_t pid_t;
 
 extern char **environ;
+extern char dir_path[256];
 
 long syscall(long, long, long, long, long, long, long);
 
@@ -74,6 +75,10 @@ size_t strlen(const char *s);
 int strcmp(const char *s1, const char *s2);
 int strncmp(const char *s1, const char *s2, size_t n);
 char *strchr(const char *s, int c);
+void strncpy(char *dest, const char *src, size_t n);
+char *strcat(char* dest, const char* src);
+const char* strpbrk(const char* str, const char* charset);
+char* strtok(char* str, const char* delimiter);
 void *memset(void *s, int c, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
 void *memcpy(void *dest, const void *src, size_t n);
@@ -102,6 +107,7 @@ int __clone(int (*func)(void *), void *stack, int flags, void *arg, ...);
 
 size_t getpagesize(void) __attribute__((const));
 
+int atoi(const char* str);
 
 #define STRINGIFY_ARG(x) #x
 #define STRINGIFY(x) STRINGIFY_ARG(x)

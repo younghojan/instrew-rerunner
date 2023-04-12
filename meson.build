@@ -1,4 +1,4 @@
-project('instrew-rerunner', ['c'],
+project('instrew-runner', ['c'],
         default_options: [
             'buildtype=debugoptimized',
             'default_library=static',
@@ -52,7 +52,7 @@ else
     error('could not lower stack aligment')
 endif
 
-runner = executable('instrew-rerunner',
+runner = executable('instrew-runner',
                     sources,
                     include_directories: include_directories('.'),
                     c_args: c_args,

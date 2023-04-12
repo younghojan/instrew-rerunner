@@ -413,6 +413,66 @@ char* strchr(const char* s, int c) {
     return *s == c ? (char*) s : NULL;
 }
 
+void strncpy(char *dest, const char *src, size_t n) {
+    for (size_t i = 0; i < n; i++) {
+        if (src[i] != '\0') {
+            dest[i] = src[i];
+        } else {
+            for (size_t j = i; j < n; j++) {
+                dest[j] = '\0';
+            }
+            break;
+        }
+    }
+}
+
+char* strcat(char* dest, const char* src) {
+    char* ret = dest;
+    while (*dest) {
+        dest++;
+    }
+    while ((*dest++ = *src++));
+    return ret;
+}
+
+const char* strpbrk(const char* str, const char* charset) {
+    const char* p = str;
+    const char* q = charset;
+    while (*p != '\0') {
+        while (*q != '\0') {
+            if (*p == *q) {
+                return p; 
+            }
+            q++;
+        }
+        q = charset; 
+        p++;
+    }
+    return NULL;
+}
+
+char* strtok(char* str, const char* delimiter) {
+    static char* nextToken = NULL; 
+    if (str != NULL) {
+        nextToken = str; 
+    }
+
+    if (nextToken == NULL || *nextToken == '\0') {
+        return NULL; 
+    }
+
+    char* token = nextToken; 
+    char* delimiterPos = strpbrk(nextToken, delimiter); 
+    if (delimiterPos != NULL) {
+        *delimiterPos = '\0';
+        nextToken = delimiterPos + 1; 
+    } else {
+        nextToken = NULL; 
+    }
+
+    return token; 
+}
+
 int puts(const char* s) {
     write(1, s, strlen(s));
     write(1, "\n", 1);
@@ -793,6 +853,30 @@ void* memcpy(void* dest, const void* src, size_t n) {
     for (; n > 0; n--)
         *(s1ptr++) = *(s2ptr++);
     return dest;
+}
+
+int atoi(const char* str) {
+    int sign = 1; 
+    int result = 0; 
+    int i = 0; 
+
+    while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == '\r') {
+        i++;
+    }
+
+    if (str[i] == '-' || str[i] == '+') {
+        if (str[i] == '-') {
+            sign = -1; 
+        }
+        i++;
+    }
+
+    while (str[i] >= '0' && str[i] <= '9') {
+        result = result * 10 + (str[i] - '0'); 
+        i++;
+    }
+
+    return result * sign;
 }
 
 __attribute__((noreturn))

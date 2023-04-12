@@ -29,11 +29,13 @@ uintptr_t resolve_func(struct CpuState *, uintptr_t, struct RtldPatchData *);
 #endif
 #define QUICK_TLB_HASH(addr) (((addr) >> QUICK_TLB_BITOFF) & ((1 << QUICK_TLB_BITS) - 1))
 
+#define PATH_MAX 256
+
 GNU_FORCE_EXTERN
 uintptr_t
 resolve_func(struct CpuState *cpu_state, uintptr_t addr,
              struct RtldPatchData *patch_data)
-{
+{   
     struct State *state = cpu_state->state;
 
     if (patch_data)
@@ -50,11 +52,14 @@ resolve_func(struct CpuState *cpu_state, uintptr_t addr,
         void *obj_base;
         size_t obj_size;
         
-        char filename[256] = "";
-        snprintf(filename, sizeof(filename), "/home/hojan/桌面/BigWorkPro/dump/func_%lx.elf", (unsigned long) addr);
-        int fd = open(filename, O_RDWR, 0);
+        char file_path[PATH_MAX] = "", file_name[PATH_MAX] = "";
+        strncpy(file_path, dir_path, sizeof(file_path));
+        snprintf(file_name, sizeof(file_name), "func_%lx.elf", (unsigned long) addr);
+        strncpy(file_path + strlen(file_path), file_name, sizeof(file_path));
+
+        int fd = open(file_path, O_RDWR, 0);
         struct stat st;
-        stat(filename, &st);
+        stat(file_path, &st);
         
         obj_size = ALIGN_UP(st.st_size, getpagesize());
         obj_base = mem_alloc_data(obj_size, getpagesize());

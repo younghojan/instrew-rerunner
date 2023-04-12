@@ -1,5 +1,5 @@
-#ifndef _INSTREW_RERUNNER_EMULATE_H
-#define _INSTREW_RERUNNER_EMULATE_H
+#ifndef _INSTREW_RUNNER_EMULATE_H
+#define _INSTREW_RUNNER_EMULATE_H
 
 #include "common.h"
 

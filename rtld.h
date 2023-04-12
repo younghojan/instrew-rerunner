@@ -1,6 +1,6 @@
 
-#ifndef _INSTREW_RERUNNER_RTLD_H
-#define _INSTREW_RERUNNER_RTLD_H
+#ifndef _INSTREW_RUNNER_RTLD_H
+#define _INSTREW_RUNNER_RTLD_H
 
 #include "common.h"
 #include "dispatcher-info.h"
