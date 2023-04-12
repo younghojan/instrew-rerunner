@@ -29,7 +29,7 @@ uintptr_t resolve_func(struct CpuState *, uintptr_t, struct RtldPatchData *);
 #endif
 #define QUICK_TLB_HASH(addr) (((addr) >> QUICK_TLB_BITOFF) & ((1 << QUICK_TLB_BITS) - 1))
 
-#define PATH_MAX 256
+#define PATH_MAX 4096
 
 GNU_FORCE_EXTERN
 uintptr_t
@@ -56,7 +56,7 @@ resolve_func(struct CpuState *cpu_state, uintptr_t addr,
         strncpy(file_path, dir_path, sizeof(file_path));
         snprintf(file_name, sizeof(file_name), "func_%lx.elf", (unsigned long) addr);
         strncpy(file_path + strlen(file_path), file_name, sizeof(file_path));
-
+        
         int fd = open(file_path, O_RDWR, 0);
         struct stat st;
         stat(file_path, &st);
