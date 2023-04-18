@@ -54,7 +54,7 @@ resolve_func(struct CpuState *cpu_state, uintptr_t addr,
         
         char file_path[PATH_MAX] = "", file_name[PATH_MAX] = "";
         strncpy(file_path, dir_path, sizeof(file_path));
-        snprintf(file_name, sizeof(file_name), "func_%lx.elf", (unsigned long) addr);
+        snprintf(file_name, sizeof(file_name), "%lx", (unsigned long) addr);
         strncpy(file_path + strlen(file_path), file_name, sizeof(file_path));
         
         int fd = open(file_path, O_RDWR, 0);
