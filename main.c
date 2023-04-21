@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     int envc = 0;
     while (environ[envc])
         envc++;
-    user_argc = 0;
+    // user_argc = 0;
     stack_top -= (user_argc + envc) & 1; // auxv has even number of entries
 
     // Set auxiliary values
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     stack_top -= user_argc;
     for (i = 0; i < user_argc; i++) {
         token = strtok(NULL, " ");
-        stack_top[i] = (size_t)argv[i];
+        stack_top[i] = (size_t)token;
     }
     *(--stack_top) = user_argc; // Argument Count
 

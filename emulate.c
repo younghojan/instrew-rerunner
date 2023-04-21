@@ -1,3 +1,8 @@
+
+#include <common.h>
+
+#include <emulate.h>
+
 #include <asm/sigcontext.h>
 #include <asm/siginfo.h>
 #include <asm/signal.h>
@@ -6,9 +11,7 @@
 #include <linux/sched.h>
 #include <linux/utsname.h>
 
-#include "common.h"
-#include "emulate.h"
-#include "cpu-state.h"
+#include <cpu-state.h>
 
 // SIG_DFL should be zero, so zero-initializing sigact is sufficient
 // Unfortunately, this is not an integer constant expression.
@@ -332,6 +335,7 @@ skipwarning:
 void emulate_syscall(uint64_t *cpu_regs)
 {
     struct CpuState *cpu_state = CPU_STATE_FROM_REGS(cpu_regs);
+    struct State *state = cpu_state->state;
 
     uint64_t arg0 = cpu_regs[8], arg1 = cpu_regs[7], arg2 = cpu_regs[3],
              arg3 = cpu_regs[11], arg4 = cpu_regs[9], arg5 = cpu_regs[10];
