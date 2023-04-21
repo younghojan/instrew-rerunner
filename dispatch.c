@@ -99,7 +99,7 @@ inline void dispatch_cdecl(uint64_t *cpu_regs)
 {
     struct CpuState *cpu_state = CPU_STATE_FROM_REGS(cpu_regs);
     uintptr_t addr = cpu_regs[0];
-    // printf("%x\n", addr);
+    printf("%x\n", addr);
     uintptr_t hash = QUICK_TLB_HASH(addr);
 
     uintptr_t func = cpu_state->quick_tlb[hash][1];

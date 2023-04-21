@@ -21,9 +21,9 @@
 #endif
 #define elf_check_arch(x) ((x)->e_machine == EM_CURRENT)
 
-#define CHECK_SIGNED_BITS(val,bits) \
-            ((val) >= -(1ll << (bits-1)) && (val) < (1ll << (bits-1))-1)
-#define CHECK_UNSIGNED_BITS(val,bits) ((val) < (1ull << (bits))-1)
+#define CHECK_SIGNED_BITS(val, bits) \
+    ((val) >= -(1ll << (bits - 1)) && (val) < (1ll << (bits - 1)) - 1)
+#define CHECK_UNSIGNED_BITS(val, bits) ((val) < (1ull << (bits)) - 1)
 
 static bool
 rtld_elf_signed_range(int64_t val, unsigned bits, const char *relinfo)
@@ -138,31 +138,32 @@ plt_create(const struct DispatcherInfo *disp_info, void **out_plt)
 }
 
 static int
-rtld_patch_create_stub(Rtld* rtld, const struct RtldPatchData* patch_data,
-                       uintptr_t* out_stub) {
+rtld_patch_create_stub(Rtld *rtld, const struct RtldPatchData *patch_data,
+                       uintptr_t *out_stub)
+{
     _Static_assert(_Alignof(struct RtldPatchData) <= 0x10,
                    "patch data alignment too big");
     _Alignas(0x10) uint8_t stcode[0x10 + sizeof(*patch_data)];
 
-    void* stub = mem_alloc_code(sizeof(stcode), 0x40);
+    void *stub = mem_alloc_code(sizeof(stcode), 0x40);
     if (BAD_ADDR(stub))
-        return (int) (uintptr_t) stub;
+        return (int)(uintptr_t)stub;
 
-    uintptr_t jmptgt = (uintptr_t) rtld->plt + 1 * PLT_FUNC_SIZE;
-    ptrdiff_t jmptgtdiff = jmptgt - (uintptr_t) stub;
+    uintptr_t jmptgt = (uintptr_t)rtld->plt + 1 * PLT_FUNC_SIZE;
+    ptrdiff_t jmptgtdiff = jmptgt - (uintptr_t)stub;
     unsigned pdr = rtld->disp_info->patch_data_reg;
 
 #if defined(__x86_64__)
     uint8_t tmpl[] = {
-        0x48 + 4*(pdr>=8), 0x8d, 5+((pdr&7)<<3), 9, 0, 0, 0, // lea rXX, [rip+9]
-        0xe9, // jmp ...
+        0x48 + 4 * (pdr >= 8), 0x8d, 5 + ((pdr & 7) << 3), 9, 0, 0, 0, // lea rXX, [rip+9]
+        0xe9,                                                          // jmp ...
     };
     memcpy(stcode, tmpl, sizeof tmpl);
-    *(uint32_t*) (stcode + 8) = jmptgtdiff - 12;
-    *(uint32_t*) (stcode + 12) = 0x0b0f0b0f; // ud2
+    *(uint32_t *)(stcode + 8) = jmptgtdiff - 12;
+    *(uint32_t *)(stcode + 12) = 0x0b0f0b0f; // ud2
 #elif defined(__aarch64__)
-    *(uint32_t*) (stcode) = 0x10000080 + pdr; // ADR xXX, pc + 0x10
-    *(uint32_t*) (stcode + 4) = 0x14000000; // B ...
+    *(uint32_t *)(stcode) = 0x10000080 + pdr;                     // ADR xXX, pc + 0x10
+    *(uint32_t *)(stcode + 4) = 0x14000000;                       // B ...
     if (!rtld_elf_signed_range(jmptgtdiff - 4, 28, "R_AARCH64_JUMP26"))
         return -EINVAL;
     rtld_blend(stcode + 4, 0x03ffffff, (jmptgtdiff - 4) >> 2);
@@ -170,13 +171,13 @@ rtld_patch_create_stub(Rtld* rtld, const struct RtldPatchData* patch_data,
 #error "missing patch stub"
 #endif
 
-    memcpy(stcode+sizeof(stcode)-sizeof(*patch_data), patch_data, sizeof(*patch_data));
+    memcpy(stcode + sizeof(stcode) - sizeof(*patch_data), patch_data, sizeof(*patch_data));
 
     int ret = mem_write_code(stub, stcode, sizeof(stcode));
     if (ret < 0)
         return ret;
 
-    *out_stub = (uintptr_t) stub;
+    *out_stub = (uintptr_t)stub;
     return 0;
 }
 
@@ -203,16 +204,33 @@ typedef struct RtldElf RtldElf;
 
 static int
 rtld_elf_init(RtldElf *re, void *obj_base, size_t obj_size, uint64_t skew, Rtld *rtld)
-{   
+{
     re->base = obj_base;
     re->size = obj_size;
     re->skew = skew;
     re->re_ehdr = (Elf64_Ehdr *)obj_base;
     re->rtld = rtld;
 
+    if (memcmp(re->re_ehdr, ELFMAG, SELFMAG) != 0)
+        goto err;
+    if (re->re_ehdr->e_type != ET_REL)
+        goto err;
+    if (re->re_ehdr->e_ident[EI_CLASS] != ELFCLASS64)
+        goto err;
+    if (!elf_check_arch(re->re_ehdr))
+        goto err;
+
+    if (re->re_ehdr->e_shentsize != sizeof(Elf64_Shdr))
+        goto err;
+    if (obj_size < re->re_ehdr->e_shoff + re->re_ehdr->e_shentsize * re->re_ehdr->e_shnum)
+        goto err;
+
     re->re_shdr = (Elf64_Shdr *)((uint8_t *)obj_base + re->re_ehdr->e_shoff);
 
     return 0;
+
+err:
+    return -EINVAL;
 }
 
 static int
