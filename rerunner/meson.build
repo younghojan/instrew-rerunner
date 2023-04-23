@@ -40,7 +40,6 @@ if host_machine.cpu_family() == 'aarch64'
 endif
 
 c_args = ['-D_GNU_SOURCE', '-fno-builtin', '-fno-stack-protector', '-fomit-frame-pointer', '-fPIC']
-
 link_args = ['-nostartfiles', '-lgcc']
 
 compiler = meson.get_compiler('c')
@@ -50,11 +49,12 @@ else
     link_args += ['-Wl,-static', '-Wl,-pie', '-Wl,--no-dynamic-linker', '-Wl,-z,text']
 endif
 
+cc = meson.get_compiler('c')
 if host_machine.cpu_family() == 'x86_64'
   if cc.has_argument('-mpreferred-stack-boundary=3') # GCC
-    client_c_args += ['-mpreferred-stack-boundary=3']
+    c_args += ['-mpreferred-stack-boundary=3']
   elif cc.has_argument('-mstack-alignment=3') # Clang
-    client_c_args += ['-mstack-alignment=3']
+    c_args += ['-mstack-alignment=3']
   else
     error('could not lower stack aligment')
   endif
