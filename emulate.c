@@ -719,6 +719,11 @@ void emulate_syscall(uint64_t *cpu_regs)
         res = ts.tv_sec;
         break;
     }
+    
+    case 231: {
+        nr = __NR_exit_group;
+        goto native;
+    }
 
     // Some syscalls aren't implemented, but ok to ignore.
     case 203: // sched_setaffinity
